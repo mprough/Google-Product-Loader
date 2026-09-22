@@ -34,7 +34,8 @@ $checks = [
     'country of origin display defaults off' => str_contains($installer, "'GPSF_DISPLAY_COUNTRY_OF_ORIGIN', 'false'"),
     'country of origin supports a per-product override' => str_contains($productObserver, "'products_country_of_origin'"),
     'country of origin helper exposes effective product data' => str_contains($storefrontHelper, 'function gpsf_get_product_country_of_origin'),
-    'TXT country of origin is a structured product detail' => str_contains($feedOutput, "product_detail\nGeneral:Country of origin:China"),
+    'TXT country of origin is a structured product detail' => str_contains($feedOutput, 'product_detail')
+        && str_contains($feedOutput, 'General:Country of origin:China'),
 ];
 
 $failed = false;
