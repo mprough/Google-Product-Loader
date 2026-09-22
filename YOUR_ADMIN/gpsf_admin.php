@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.13
+// Last updated: Reimagined Release v1.0.15
 //
 /**
  * Based on:
@@ -25,6 +25,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'install_product_field') {
         'age_group' => ['column' => 'products_age_group', 'sql' => "VARCHAR(32) NOT NULL DEFAULT ''", 'label' => 'Age Group'],
         'color' => ['column' => 'products_color', 'sql' => "VARCHAR(255) NOT NULL DEFAULT ''", 'label' => 'Color'],
         'gender' => ['column' => 'products_gender', 'sql' => "VARCHAR(16) NOT NULL DEFAULT ''", 'label' => 'Gender'],
+        'country_of_origin' => ['column' => 'products_country_of_origin', 'sql' => 'INT UNSIGNED NOT NULL DEFAULT 0', 'label' => 'Country of origin'],
     ];
     $field = $_GET['field'] ?? '';
     $tokenIsValid = isset($_GET['securityToken'], $_SESSION['securityToken'])

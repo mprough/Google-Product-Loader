@@ -4,14 +4,14 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.14
+// Last updated: Reimagined Release v1.0.15
 //
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
 define('GPSF_CURRENT_VERSION', '1.0.5');
-define('RHS_GPSF_CURRENT_VERSION', '1.0.14');
+define('RHS_GPSF_CURRENT_VERSION', '1.0.15');
 
 // -----
 // Nothing to do if an admin is not currently logged-in or if the plugin's currently installed
@@ -137,6 +137,12 @@ if (!defined('GPSF_VERSION')) {
             ('Color Product Field', 'GPSF_PRODUCT_FIELD_COLOR', 'products_color', '<br>Install an optional Color entry on the admin product page. Populated values are exported as <code>color</code>.', $cgi, 434, now(), NULL, 'gpsf_product_field_install_control('),
 
             ('Gender Product Field', 'GPSF_PRODUCT_FIELD_GENDER', 'products_gender', '<br>Install an optional Gender entry on the admin product page. Populated values are exported as <code>gender</code>.', $cgi, 436, now(), NULL, 'gpsf_product_field_install_control('),
+
+            ('Default Country of Origin', 'GPSF_DEFAULT_COUNTRY_OF_ORIGIN', '0', '<br>Store-wide country-of-origin fallback. A product-specific selection overrides this value. Not specified omits the feed detail.', $cgi, 437, now(), NULL, 'gpsf_cfg_pull_down_country_of_origin('),
+
+            ('Country of Origin Product Field', 'GPSF_PRODUCT_FIELD_COUNTRY_OF_ORIGIN', 'products_country_of_origin', '<br><strong>Back up the database before installing.</strong> Adds a country selector to the admin product page. Each product can use the store default or select another country.', $cgi, 438, now(), NULL, 'gpsf_product_field_install_control('),
+
+            ('Display Country of Origin on Product Page', 'GPSF_DISPLAY_COUNTRY_OF_ORIGIN', 'false', '<br>Set to true to append the effective country of origin to the product description area. Leave false when the product description already displays this information.', $cgi, 439, now(), NULL, 'zen_cfg_select_option([\'true\', \'false\'],'),
 
             ('Custom Product Field 1', 'GPSF_CUSTOM_PRODUCT_FIELD_1', '', '<br><strong>Back up the database before installing fields.</strong> Enter a lowercase database and feed column name with no spaces, such as <code>vehicle_type</code>, then click Install. The field appears on the admin product page and populated values are exported under the same name. Clearing and saving this setting stops using the field but <strong>does not remove the database column or its product data</strong>.', $cgi, 440, now(), NULL, 'gpsf_custom_product_field_install_control(1,'),
 
@@ -575,6 +581,66 @@ switch (true) {
         }
     case version_compare($installedReimaginedVersion, '1.0.14', '<'):          //-Fall through from above processing ...
         // Catalog-code and documentation update; no new configuration rows.
+    case version_compare($installedReimaginedVersion, '1.0.15', '<'):          //-Fall through from above processing ...
+        $countryOfOriginSettings = [
+            [
+                '8.05 Default country of origin',
+                'GPSF_DEFAULT_COUNTRY_OF_ORIGIN',
+                '0',
+                '<br>Store-wide country-of-origin fallback. A product-specific selection overrides this value. Not specified omits the feed detail.',
+                718,
+                'gpsf_cfg_pull_down_country_of_origin(',
+            ],
+            [
+                '8.06 Country of origin product field',
+                'GPSF_PRODUCT_FIELD_COUNTRY_OF_ORIGIN',
+                'products_country_of_origin',
+                '<br><strong>Back up the database before installing.</strong> Adds a country selector to the admin product page. Each product can use the store default or select another country.',
+                720,
+                'gpsf_product_field_install_control(',
+            ],
+            [
+                '8.07 Display country of origin on product page',
+                'GPSF_DISPLAY_COUNTRY_OF_ORIGIN',
+                'false',
+                '<br>Set to true to append the effective country of origin to the product description area. Leave false when the product description already displays this information.',
+                722,
+                'zen_cfg_select_option([\'true\', \'false\'],',
+            ],
+        ];
+        foreach ($countryOfOriginSettings as $setting) {
+            $sql = "INSERT INTO " . TABLE_CONFIGURATION . "
+                        (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added, use_function, set_function)
+                    SELECT :title:, :configurationKey:, :configurationValue:, :description:, :groupId:, :sortOrder:, now(), NULL, :setFunction:
+                     WHERE NOT EXISTS (
+                        SELECT 1
+                          FROM " . TABLE_CONFIGURATION . "
+                         WHERE configuration_key = :configurationKeyCheck:
+                     )";
+            $sql = $db->bindVars($sql, ':title:', $setting[0], 'string');
+            $sql = $db->bindVars($sql, ':configurationKey:', $setting[1], 'string');
+            $sql = $db->bindVars($sql, ':configurationValue:', $setting[2], 'string');
+            $sql = $db->bindVars($sql, ':description:', $setting[3], 'string');
+            $sql = $db->bindVars($sql, ':groupId:', (int)$cgi, 'integer');
+            $sql = $db->bindVars($sql, ':sortOrder:', (int)$setting[4], 'integer');
+            $sql = $db->bindVars($sql, ':setFunction:', $setting[5], 'string');
+            $sql = $db->bindVars($sql, ':configurationKeyCheck:', $setting[1], 'string');
+            $db->Execute($sql);
+
+            $sql = "UPDATE " . TABLE_CONFIGURATION . "
+                       SET configuration_title = :title:,
+                           configuration_description = :description:,
+                           sort_order = :sortOrder:,
+                           set_function = :setFunction:
+                     WHERE configuration_key = :configurationKey:
+                     LIMIT 1";
+            $sql = $db->bindVars($sql, ':title:', $setting[0], 'string');
+            $sql = $db->bindVars($sql, ':description:', $setting[3], 'string');
+            $sql = $db->bindVars($sql, ':sortOrder:', (int)$setting[4], 'integer');
+            $sql = $db->bindVars($sql, ':setFunction:', $setting[5], 'string');
+            $sql = $db->bindVars($sql, ':configurationKey:', $setting[1], 'string');
+            $db->Execute($sql);
+        }
     default:                                                    //-Fall through from above processing ...
         break;
 }

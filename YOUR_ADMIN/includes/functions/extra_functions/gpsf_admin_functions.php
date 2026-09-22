@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.13
+// Last updated: Reimagined Release v1.0.15
 //
 /**
  * Based on:
@@ -55,6 +55,32 @@ function gpsf_cfg_pull_down_country_iso3_list($countries_id, $key = ''): string
     return zen_draw_pull_down_menu($name, $countries_array, $countries_id);
 }
 
+function gpsf_cfg_pull_down_country_of_origin($countries_id, $key = ''): string
+{
+    global $db;
+
+    $name = (($key !== '') ? "configuration[$key]" : 'configuration_value');
+    $countries = $db->Execute(
+        'SELECT countries_id, countries_name, countries_iso_code_2
+           FROM ' . TABLE_COUNTRIES . '
+          ORDER BY countries_name ASC'
+    );
+    $countriesArray = [
+        [
+            'id' => 0,
+            'text' => '-- Not specified --',
+        ],
+    ];
+    foreach ($countries as $nextCountry) {
+        $countriesArray[] = [
+            'id' => (int)$nextCountry['countries_id'],
+            'text' => $nextCountry['countries_name'] . ' (' . $nextCountry['countries_iso_code_2'] . ')',
+        ];
+    }
+
+    return zen_draw_pull_down_menu($name, $countriesArray, (int)$countries_id);
+}
+
 function gpsf_product_field_install_control($column, $key = ''): string
 {
     global $sniffer;
@@ -64,6 +90,7 @@ function gpsf_product_field_install_control($column, $key = ''): string
         'products_age_group' => 'age_group',
         'products_color' => 'color',
         'products_gender' => 'gender',
+        'products_country_of_origin' => 'country_of_origin',
     ];
     $name = ($key !== '') ? "configuration[$key]" : 'configuration_value';
     $control = zen_draw_hidden_field($name, $column);

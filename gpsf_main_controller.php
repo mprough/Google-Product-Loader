@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.14
+// Last updated: Reimagined Release v1.0.15
 //
 /**
  * Based on
@@ -167,7 +167,7 @@ if (isset($_REQUEST['status']) && $_REQUEST['status'] === '1') {
 }
 
 ob_start();
-$reimaginedVersion = defined('RHS_GPSF_VERSION') ? RHS_GPSF_VERSION : '1.0.14';
+$reimaginedVersion = defined('RHS_GPSF_VERSION') ? RHS_GPSF_VERSION : '1.0.15';
 echo '<p>' . sprintf(TEXT_GPSF_STARTED, $reimaginedVersion) . '</p>';
 echo '<p>' . TEXT_GPSF_FILE_LOCATION . $outfile . '</p>';
 echo '<p>Processing: Feed - ' . ($feed === 'yes' ? 'Yes' : 'No') . '</p>';

@@ -1,6 +1,6 @@
 # Configuration settings reference
 
-This reference covers every setting shown under **Configuration > Google Product Feeder** in Reimagined Release v1.0.14.
+This reference covers every setting shown under **Configuration > Google Product Feeder** in Reimagined Release v1.0.15.
 
 ## 1. Status and security
 
@@ -96,8 +96,13 @@ These settings affect only the feed. They do not change Zen Cart shipping calcul
 | Age group | `GPSF_PRODUCT_FIELD_AGE_GROUP` | `products_age_group` | **Back up the database first.** Adds an admin selector for `newborn`, `infant`, `toddler`, `kids`, or `adult`. Populated values export as `age_group`. |
 | Color | `GPSF_PRODUCT_FIELD_COLOR` | `products_color` | **Back up the database first.** Installs the column and adds Color to the admin product editor. Populated values export as `color`. |
 | Gender | `GPSF_PRODUCT_FIELD_GENDER` | `products_gender` | **Back up the database first.** Adds an admin selector for `male`, `female`, or `unisex`. Populated values export as `gender`. |
+| Default country of origin | `GPSF_DEFAULT_COUNTRY_OF_ORIGIN` | Not specified | Store-wide fallback. Select a country to export it when a product has no override. Not specified omits the detail unless a product override is selected. |
+| Country of origin product field | `GPSF_PRODUCT_FIELD_COUNTRY_OF_ORIGIN` | `products_country_of_origin` | **Back up the database first.** Installs the column and adds a country selector to the admin product editor. Use store default inherits the fallback; another selection overrides it. |
+| Display country of origin on product page | `GPSF_DISPLAY_COUNTRY_OF_ORIGIN` | `false`; true or false | Set true to append the effective country to the product description area. Leave false when descriptions or templates already display it. |
 
 Only non-empty values are exported. Values supplied by product attributes or feeder extensions take precedence.
+
+Country of origin is exported as the supported Google `product_detail` value `General:Country of origin:Country name`, not as a custom `country_of_origin` column. The helper `gpsf_get_product_country_of_origin()` makes the effective value available to structured-data integrations.
 
 ## 9. Custom product fields
 

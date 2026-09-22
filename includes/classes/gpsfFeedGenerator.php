@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.14
+// Last updated: Reimagined Release v1.0.15
 //
 /**
  * Based on:
@@ -229,6 +229,7 @@ class gpsfFeedGenerator
         $lastProgressTime = 0.0,
         $lastProgressScanned = 0,
         $taxRates = [],
+        $countryOfOriginCache = [],
         $identifiersSet,
         $identifiersList,
 
@@ -612,6 +613,8 @@ class gpsfFeedGenerator
 
             $this->writeCustomFields($custom_fields);
 
+            $this->writeCountryOfOriginProductDetail($product);
+
             // add universal elements/attributes to products
             $this->addUniversalAttributes($product, $products_description, $products_image);
 
@@ -990,7 +993,7 @@ class gpsfFeedGenerator
             $additional_fields .= ', ' . $field_name;
         }
 
-        foreach (['products_material', 'products_age_group', 'products_color', 'products_gender'] as $next_field) {
+        foreach (['products_material', 'products_age_group', 'products_color', 'products_gender', 'products_country_of_origin'] as $next_field) {
             $field_name = 'p.' . $next_field;
             if (strpos($additional_fields, $field_name) === false && $sniffer->field_exists(TABLE_PRODUCTS, $next_field)) {
                 $additional_fields .= ', ' . $field_name;
@@ -1009,6 +1012,47 @@ class gpsfFeedGenerator
             $additional_tables,
             $additional_where_clause,
         ];
+    }
+
+    protected function writeCountryOfOriginProductDetail(array $product): void
+    {
+        $countryId = (int)($product['products_country_of_origin'] ?? 0);
+        if ($countryId < 1 && defined('GPSF_DEFAULT_COUNTRY_OF_ORIGIN')) {
+            $countryId = (int)GPSF_DEFAULT_COUNTRY_OF_ORIGIN;
+        }
+        if ($countryId < 1) {
+            return;
+        }
+
+        $countryName = $this->getCountryOfOriginName($countryId);
+        if ($countryName === '') {
+            return;
+        }
+
+        $this->xmlWriter->startElement('g:product_detail');
+        $this->xmlWriter->writeElement('g:section_name', 'General');
+        $this->xmlWriter->writeElement('g:attribute_name', 'Country of origin');
+        $this->xmlWriter->writeElement('g:attribute_value', $this->sanitizeXml($countryName));
+        $this->xmlWriter->endElement();
+    }
+
+    protected function getCountryOfOriginName(int $countryId): string
+    {
+        global $db;
+
+        if (!array_key_exists($countryId, $this->countryOfOriginCache)) {
+            $country = $db->Execute(
+                'SELECT countries_name
+                   FROM ' . TABLE_COUNTRIES . '
+                  WHERE countries_id = ' . $countryId . '
+                  LIMIT 1'
+            );
+            $this->countryOfOriginCache[$countryId] = $country->EOF
+                ? ''
+                : (string)$country->fields['countries_name'];
+        }
+
+        return $this->countryOfOriginCache[$countryId];
     }
 
     protected function addProductsAdditionalImages($products_image)
