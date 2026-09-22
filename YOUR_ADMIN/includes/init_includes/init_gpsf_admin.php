@@ -4,14 +4,14 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.15
+// Last updated: Reimagined Release v1.0.16
 //
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
 define('GPSF_CURRENT_VERSION', '1.0.5');
-define('RHS_GPSF_CURRENT_VERSION', '1.0.15');
+define('RHS_GPSF_CURRENT_VERSION', '1.0.16');
 
 // -----
 // Nothing to do if an admin is not currently logged-in or if the plugin's currently installed
@@ -641,6 +641,22 @@ switch (true) {
             $sql = $db->bindVars($sql, ':configurationKey:', $setting[1], 'string');
             $db->Execute($sql);
         }
+    case version_compare($installedReimaginedVersion, '1.0.16', '<'):          //-Fall through from above processing ...
+        // The product selector is part of the country-of-origin feature. Install its
+        // backing column during the upgrade instead of requiring a second manual action.
+        if (!$sniffer->field_exists(TABLE_PRODUCTS, 'products_country_of_origin')) {
+            $db->Execute(
+                'ALTER TABLE ' . TABLE_PRODUCTS .
+                ' ADD COLUMN `products_country_of_origin` INT UNSIGNED NOT NULL DEFAULT 0'
+            );
+            zen_record_admin_activity('Installed Google feed product field products_country_of_origin.', 'info');
+        }
+        $db->Execute(
+            "UPDATE " . TABLE_CONFIGURATION . "
+                SET configuration_description = '<br>The backing column and admin product selector are installed automatically. Each product can use the store default or select another country.'
+              WHERE configuration_key = 'GPSF_PRODUCT_FIELD_COUNTRY_OF_ORIGIN'
+              LIMIT 1"
+        );
     default:                                                    //-Fall through from above processing ...
         break;
 }

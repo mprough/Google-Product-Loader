@@ -1,6 +1,6 @@
-# Zen Cart&reg; Google Product Search Feeder II (Reimagined), Release v1.0.15
+# Zen Cart&reg; Google Product Search Feeder II (Reimagined), Release v1.0.16
 
-Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchant Center product feeds from a Zen Cart catalog. This independent fork is based on Google Product Search Feeder II v1.0.5 and updates it for current Zen Cart releases. Reimagined Release v1.0.15 is compatible with Zen Cart 2.2.2 and PHP 8.5 while retaining support for Zen Cart 1.5.6b and later and PHP 7.0 and later.
+Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchant Center product feeds from a Zen Cart catalog. This independent fork is based on Google Product Search Feeder II v1.0.5 and updates it for current Zen Cart releases. Reimagined Release v1.0.16 is compatible with Zen Cart 2.2.2 and PHP 8.5 while retaining support for Zen Cart 1.5.6b and later and PHP 7.0 and later.
 
 ## Features
 
@@ -21,7 +21,7 @@ Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchan
 2. Rename the package's `YOUR_ADMIN` directory to match the store's admin directory.
 3. Upload the package files while preserving their directory structure. Make sure both the catalog-side generator files and admin files are updated.
 4. Sign out of Zen Cart admin, then sign back in. The feeder's non-destructive database upgrade runs during admin initialization.
-5. Open **Configuration > Google Product Feeder** and confirm that the installed Reimagined Release is `1.0.15`.
+5. Open **Configuration > Google Product Feeder** and confirm that the installed Reimagined Release is `1.0.16`.
 
 The database retains the original `Google Product Search Feeder II` configuration-group identity for upgrade and rollback compatibility. The admin menus use the shorter `Google Product Feeder` label.
 
@@ -96,7 +96,7 @@ Only non-empty values are exported. A value already provided by product attribut
 
 ### Country of origin
 
-Set **Default Country of Origin** to provide a store-wide fallback. Install **Country of Origin Product Field** to add a selector to the normal admin product editor. **Use store default** inherits the configured fallback; selecting another country overrides it for that product. When neither value is set, country of origin is omitted.
+Set **Default Country of Origin** to provide a store-wide fallback. The country selector is installed automatically on the normal admin product editor. **Use store default** inherits the configured fallback; selecting another country overrides it for that product. When neither value is set, country of origin is omitted.
 
 The feeder exports the effective value through Google's supported `product_detail` attribute as `General:Country of origin:Country name`. It does not create an unsupported `country_of_origin` feed column. The catalog helper `gpsf_get_product_country_of_origin()` exposes the same effective value to structured-data integrations.
 
@@ -131,6 +131,12 @@ The heartbeat is updated at least every five seconds while products are being pr
 Heartbeat data is stored in a hidden status file beside the configured feed output. Successful and failed runs retain their final status for inspection. Gzip compression is streamed in chunks so a large completed feed is not loaded into PHP memory all at once.
 
 ## Version history
+
+### Reimagined Release v1.0.16, 2026-09-22
+
+- Automatically installs the country-of-origin product column during installation or upgrade
+- Ensures the country selector appears on the normal admin product page without a separate field-install action
+- Keeps the optional storefront country display disabled by default
 
 ### Reimagined Release v1.0.15, 2026-09-22
 
@@ -261,6 +267,6 @@ Report plugin bugs through the [PRO-Webs helpdesk](https://prowebsinc.zohodesk.c
 
 - Original Google Merchant Center Feeder by Numinix
 - Red Headed Stepchild of Zen Cart® Google Product Search Feeder II update by lat9 and contributors
-- Reimagined Releases v1.0.0-v1.0.15 developed by [PRO-Webs, Inc.](https://PRO-Webs.net), Melanie Prough
+- Reimagined Releases v1.0.0-v1.0.16 developed by [PRO-Webs, Inc.](https://PRO-Webs.net), Melanie Prough
 
 Zen Cart&reg; is a registered trademark of Zen Ventures, LLC. Google and Google Merchant Center are trademarks of Google LLC.
