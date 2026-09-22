@@ -3,7 +3,7 @@
 // Google Product Feeder country-of-origin helper.
 // Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.15
+// Last updated: Reimagined Release v1.0.17
 //
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');

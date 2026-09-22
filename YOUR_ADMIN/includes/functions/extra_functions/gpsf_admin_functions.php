@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.16
+// Last updated: Reimagined Release v1.0.17
 //
 /**
  * Based on:
@@ -91,6 +91,7 @@ function gpsf_product_field_install_control($column, $key = ''): string
         'products_color' => 'color',
         'products_gender' => 'gender',
         'products_country_of_origin' => 'country_of_origin',
+        'products_video_link' => 'video_link',
     ];
     $name = ($key !== '') ? "configuration[$key]" : 'configuration_value';
     $control = zen_draw_hidden_field($name, $column);

@@ -4,7 +4,7 @@
 // Copyright 2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.16
+// Last updated: Reimagined Release v1.0.17
 //
 if (!defined('IS_ADMIN_FLAG') || IS_ADMIN_FLAG !== true) {
     die('Illegal Access');
@@ -36,6 +36,10 @@ class zcObserverGpsfProductFields extends base
         'products_country_of_origin' => [
             'label' => 'Country of origin',
             'country_options' => true,
+        ],
+        'products_video_link' => [
+            'label' => 'Google Feed Video Links',
+            'textarea' => true,
         ],
     ];
 
@@ -99,6 +103,16 @@ class zcObserverGpsfProductFields extends base
                     }
                 }
                 $input = zen_draw_pull_down_menu($column, $options, $value, 'class="form-control" id="' . $column . '"');
+            } elseif (!empty($definition['textarea'])) {
+                $input = zen_draw_textarea_field(
+                    $column,
+                    'soft',
+                    '100%',
+                    '3',
+                    $value,
+                    'class="form-control" id="' . $column . '" maxlength="20009"'
+                );
+                $input .= '<p class="help-block">Enter up to 10 product-specific video URLs, one per line or separated by commas. YouTube links and direct video-file URLs are supported.</p>';
             } else {
                 $input = zen_draw_input_field(
                     $column,
@@ -131,6 +145,9 @@ class zcObserverGpsfProductFields extends base
                 continue;
             }
             $value = trim((string)$_POST[$column]);
+            if (!empty($definition['textarea'])) {
+                $value = $this->normalizeVideoLinks($value);
+            }
             if (isset($definition['options'])) {
                 $allowedValues = [];
                 foreach ($definition['options'] as $option) {
@@ -183,5 +200,37 @@ class zcObserverGpsfProductFields extends base
         }
 
         return $options;
+    }
+
+    protected function normalizeVideoLinks(string $value): string
+    {
+        global $messageStack;
+
+        $links = preg_split('/[\r\n,]+/', $value, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $validLinks = [];
+        $invalidLinks = 0;
+        foreach ($links as $link) {
+            $link = trim($link);
+            $scheme = strtolower((string)parse_url($link, PHP_URL_SCHEME));
+            if (
+                $link === ''
+                || strlen($link) > 2000
+                || preg_match('/[^\x20-\x7E]/', $link) === 1
+                || !filter_var($link, FILTER_VALIDATE_URL)
+                || !in_array($scheme, ['http', 'https'], true)
+            ) {
+                $invalidLinks++;
+                continue;
+            }
+            $validLinks[$link] = true;
+            if (count($validLinks) === 10) {
+                break;
+            }
+        }
+        if ($invalidLinks > 0 && isset($messageStack)) {
+            $messageStack->add_session('One or more invalid Google Feed Video Links were not saved. Use public HTTP or HTTPS URLs with ASCII characters only.', 'warning');
+        }
+
+        return implode("\n", array_keys($validLinks));
     }
 }

@@ -4,7 +4,7 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.15
+// Last updated: Reimagined Release v1.0.17
 //
 /**
  * Based on:
@@ -615,6 +615,8 @@ class gpsfFeedGenerator
 
             $this->writeCountryOfOriginProductDetail($product);
 
+            $this->writeProductVideoLinks($product);
+
             // add universal elements/attributes to products
             $this->addUniversalAttributes($product, $products_description, $products_image);
 
@@ -993,7 +995,7 @@ class gpsfFeedGenerator
             $additional_fields .= ', ' . $field_name;
         }
 
-        foreach (['products_material', 'products_age_group', 'products_color', 'products_gender', 'products_country_of_origin'] as $next_field) {
+        foreach (['products_material', 'products_age_group', 'products_color', 'products_gender', 'products_country_of_origin', 'products_video_link'] as $next_field) {
             $field_name = 'p.' . $next_field;
             if (strpos($additional_fields, $field_name) === false && $sniffer->field_exists(TABLE_PRODUCTS, $next_field)) {
                 $additional_fields .= ', ' . $field_name;
@@ -1053,6 +1055,38 @@ class gpsfFeedGenerator
         }
 
         return $this->countryOfOriginCache[$countryId];
+    }
+
+    protected function writeProductVideoLinks(array $product): void
+    {
+        $value = trim((string)($product['products_video_link'] ?? ''));
+        if ($value === '') {
+            return;
+        }
+
+        $links = preg_split('/[\r\n,]+/', $value, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $written = 0;
+        $seen = [];
+        foreach ($links as $link) {
+            $link = trim($link);
+            $scheme = strtolower((string)parse_url($link, PHP_URL_SCHEME));
+            if (
+                $link === ''
+                || isset($seen[$link])
+                || strlen($link) > 2000
+                || preg_match('/[^\x20-\x7E]/', $link) === 1
+                || !filter_var($link, FILTER_VALIDATE_URL)
+                || !in_array($scheme, ['http', 'https'], true)
+            ) {
+                continue;
+            }
+            $this->xmlWriter->writeElement('g:video_link', $this->sanitizeLink($link));
+            $seen[$link] = true;
+            $written++;
+            if ($written === 10) {
+                break;
+            }
+        }
     }
 
     protected function addProductsAdditionalImages($products_image)

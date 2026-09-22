@@ -1,6 +1,6 @@
-# Zen Cart&reg; Google Product Search Feeder II (Reimagined), Release v1.0.16
+# Zen Cart&reg; Google Product Search Feeder II (Reimagined), Release v1.0.17
 
-Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchant Center product feeds from a Zen Cart catalog. This independent fork is based on Google Product Search Feeder II v1.0.5 and updates it for current Zen Cart releases. Reimagined Release v1.0.16 is compatible with Zen Cart 2.2.2 and PHP 8.5 while retaining support for Zen Cart 1.5.6b and later and PHP 7.0 and later.
+Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchant Center product feeds from a Zen Cart catalog. This independent fork is based on Google Product Search Feeder II v1.0.5 and updates it for current Zen Cart releases. Reimagined Release v1.0.17 is compatible with Zen Cart 2.2.2 and PHP 8.5 while retaining support for Zen Cart 1.5.6b and later and PHP 7.0 and later.
 
 ## Features
 
@@ -11,6 +11,7 @@ Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchan
 - A configurable default weight for products whose catalog weight is empty or zero
 - Optional database and admin product fields for `material`, `age_group`, `color`, and `gender`
 - Store-wide and optional per-product country of origin with Google `product_detail` export
+- Automatically installed per-product Google `video_link` field with support for up to 10 videos
 - Five installable custom product fields with matching database and feed column names
 - Server-side feed heartbeat with product counts, progress, memory use, and failure reporting
 - Gzip compression, scheduled generation, language selection, and existing GPSF extension support
@@ -21,13 +22,13 @@ Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchan
 2. Rename the package's `YOUR_ADMIN` directory to match the store's admin directory.
 3. Upload the package files while preserving their directory structure. Make sure both the catalog-side generator files and admin files are updated.
 4. Sign out of Zen Cart admin, then sign back in. The feeder's non-destructive database upgrade runs during admin initialization.
-5. Open **Configuration > Google Product Feeder** and confirm that the installed Reimagined Release is `1.0.16`.
+5. Open **Configuration > Google Product Feeder** and confirm that the installed Reimagined Release is `1.0.17`.
 
 The database retains the original `Google Product Search Feeder II` configuration-group identity for upgrade and rollback compatibility. The admin menus use the shorter `Google Product Feeder` label.
 
 When upgrading, do not copy only the admin files. Feed generation runs from catalog-side files such as `includes/classes/gpsfFeedGenerator.php`, so an incomplete upload can show the new version in admin while continuing to generate an older feed.
 
-The optional product columns described below are not created automatically during an upgrade. Back up the database first, then install only the fields the store needs by using their individual controls in the feeder configuration page.
+The country-of-origin and video-link product columns are created automatically during installation or upgrade. Other optional product columns described below use their individual installation controls. Back up the database before installing or upgrading.
 
 ## Admin locations
 
@@ -102,6 +103,14 @@ The feeder exports the effective value through Google's supported `product_detai
 
 **Display Country of Origin on Product Page** defaults to `false`. Set it to `true` only when the product description or template does not already display the information. When enabled, the plugin appends a visible line to the product description area.
 
+### Product videos
+
+The automatically installed `products_video_link` field appears as **Google Feed Video Links** on the normal admin product editor. Enter up to 10 product-specific URLs, one per line or separated by commas. Empty product fields are omitted from the feed. There is no store-wide default because Google requires each submitted video to represent the product.
+
+YouTube URLs and direct links to supported video files can be used. A link from another video host must point to the raw video file rather than a webpage containing a player. Google requires public, stable and crawlable URLs; videos between 6 and 240 seconds; a maximum file size of 500 MB; at least 720p resolution; and a 9:16, 16:9 or 1:1 aspect ratio. See Google's [video link specification](https://support.google.com/merchants/answer/15216925?hl=en).
+
+XML feeds repeat `<g:video_link>` for each URL. TXT feeds place the URLs in the `video_link` column separated by commas.
+
 ### Configurable custom product fields
 
 Reimagined Release v1.0.5 and later provide five blank custom product-field slots. Enter a lowercase database and feed column name with no spaces, such as `vehicle_type`, and click **Install**. The installer creates that exact column in the products table, adds a **Google Feed Vehicle Type** entry to the admin product page, and exports populated values under the `vehicle_type` feed heading. Blank slots and blank product values are not exported.
@@ -131,6 +140,13 @@ The heartbeat is updated at least every five seconds while products are being pr
 Heartbeat data is stored in a hidden status file beside the configured feed output. Successful and failed runs retain their final status for inspection. Gzip compression is streamed in chunks so a large completed feed is not loaded into PHP memory all at once.
 
 ## Version history
+
+### Reimagined Release v1.0.17, 2026-09-22
+
+- Automatically installs a per-product `products_video_link` field
+- Adds a multiline Google Feed Video Links input to the normal admin product editor
+- Exports up to 10 valid product-specific URLs through Google's `video_link` attribute in XML and TXT feeds
+- Omits `video_link` when a product has no video and provides no store-wide default
 
 ### Reimagined Release v1.0.16, 2026-09-22
 
@@ -267,6 +283,6 @@ Report plugin bugs through the [PRO-Webs helpdesk](https://prowebsinc.zohodesk.c
 
 - Original Google Merchant Center Feeder by Numinix
 - Red Headed Stepchild of Zen Cart® Google Product Search Feeder II update by lat9 and contributors
-- Reimagined Releases v1.0.0-v1.0.16 developed by [PRO-Webs, Inc.](https://PRO-Webs.net), Melanie Prough
+- Reimagined Releases v1.0.0-v1.0.17 developed by [PRO-Webs, Inc.](https://PRO-Webs.net), Melanie Prough
 
 Zen Cart&reg; is a registered trademark of Zen Ventures, LLC. Google and Google Merchant Center are trademarks of Google LLC.

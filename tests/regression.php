@@ -15,6 +15,8 @@ $writer->writeElement('g:section_name', 'General');
 $writer->writeElement('g:attribute_name', 'Country of origin');
 $writer->writeElement('g:attribute_value', 'China');
 $writer->endElement();
+$writer->writeElement('g:video_link', 'https://youtu.be/example-one');
+$writer->writeElement('g:video_link', 'https://example.com/example-two.mp4');
 $writer->endElement();
 $feedStream = fopen('php://temp', 'w+');
 $writer->export($feedStream);
@@ -27,7 +29,7 @@ $checks = [
     'excluded categories use category assignments' => str_contains($generator, 'gpsf_pc_exclude.categories_id IN'),
     'master category is no longer the category filter' => !str_contains($generator, 'p.master_categories_id IN ('),
     'query exclusions are diagnosed' => str_contains($generator, 'Initial query exclusion - '),
-    'release version is 1.0.16' => str_contains($installer, "RHS_GPSF_CURRENT_VERSION', '1.0.16"),
+    'release version is 1.0.17' => str_contains($installer, "RHS_GPSF_CURRENT_VERSION', '1.0.17"),
     'country column is installed during upgrade' => str_contains($installer, "ADD COLUMN `products_country_of_origin` INT UNSIGNED NOT NULL DEFAULT 0"),
     'admin menus use the short label' => substr_count($menuLanguage, "'Google Product Feeder'") === 2,
     'country of origin exports as product detail' => str_contains($generator, "startElement('g:product_detail')"),
@@ -37,6 +39,12 @@ $checks = [
     'country of origin helper exposes effective product data' => str_contains($storefrontHelper, 'function gpsf_get_product_country_of_origin'),
     'TXT country of origin is a structured product detail' => str_contains($feedOutput, 'product_detail')
         && str_contains($feedOutput, 'General:Country of origin:China'),
+    'video link column is installed during upgrade' => str_contains($installer, "ADD COLUMN `products_video_link` TEXT NULL"),
+    'video link supports a per-product field' => str_contains($productObserver, "'products_video_link'"),
+    'generator emits repeated video links' => str_contains($generator, "writeElement('g:video_link'")
+        && str_contains($generator, 'if ($written === 10)'),
+    'TXT repeated video links are comma separated' => str_contains($feedOutput, 'video_link')
+        && str_contains($feedOutput, 'https://youtu.be/example-one,https://example.com/example-two.mp4'),
 ];
 
 $failed = false;

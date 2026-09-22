@@ -4,14 +4,14 @@
 // Copyright 2023-2026, https://vinosdefrutastropicales.com
 // Modifications Copyright 2026 PRO-Webs, Inc. (Melanie Prough), https://PRO-Webs.net
 //
-// Last updated: Reimagined Release v1.0.16
+// Last updated: Reimagined Release v1.0.17
 //
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
 
 define('GPSF_CURRENT_VERSION', '1.0.5');
-define('RHS_GPSF_CURRENT_VERSION', '1.0.16');
+define('RHS_GPSF_CURRENT_VERSION', '1.0.17');
 
 // -----
 // Nothing to do if an admin is not currently logged-in or if the plugin's currently installed
@@ -655,6 +655,39 @@ switch (true) {
             "UPDATE " . TABLE_CONFIGURATION . "
                 SET configuration_description = '<br>The backing column and admin product selector are installed automatically. Each product can use the store default or select another country.'
               WHERE configuration_key = 'GPSF_PRODUCT_FIELD_COUNTRY_OF_ORIGIN'
+              LIMIT 1"
+        );
+    case version_compare($installedReimaginedVersion, '1.0.17', '<'):          //-Fall through from above processing ...
+        if (!$sniffer->field_exists(TABLE_PRODUCTS, 'products_video_link')) {
+            $db->Execute(
+                'ALTER TABLE ' . TABLE_PRODUCTS .
+                ' ADD COLUMN `products_video_link` TEXT NULL'
+            );
+            zen_record_admin_activity('Installed Google feed product field products_video_link.', 'info');
+        }
+        $sql = "INSERT INTO " . TABLE_CONFIGURATION . "
+                    (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added, use_function, set_function)
+                SELECT '8.08 Video link product field', 'GPSF_PRODUCT_FIELD_VIDEO_LINK', 'products_video_link', :description:, :groupId:, 724, now(), NULL, 'gpsf_product_field_install_control('
+                 WHERE NOT EXISTS (
+                    SELECT 1
+                      FROM " . TABLE_CONFIGURATION . "
+                     WHERE configuration_key = 'GPSF_PRODUCT_FIELD_VIDEO_LINK'
+                 )";
+        $sql = $db->bindVars(
+            $sql,
+            ':description:',
+            '<br>The backing column and admin product field are installed automatically. Enter up to 10 product-specific YouTube or direct video-file URLs. Leave the product field empty to omit video_link.',
+            'string'
+        );
+        $sql = $db->bindVars($sql, ':groupId:', (int)$cgi, 'integer');
+        $db->Execute($sql);
+        $db->Execute(
+            "UPDATE " . TABLE_CONFIGURATION . "
+                SET configuration_title = '8.08 Video link product field',
+                    configuration_description = '<br>The backing column and admin product field are installed automatically. Enter up to 10 product-specific YouTube or direct video-file URLs. Leave the product field empty to omit video_link.',
+                    sort_order = 724,
+                    set_function = 'gpsf_product_field_install_control('
+              WHERE configuration_key = 'GPSF_PRODUCT_FIELD_VIDEO_LINK'
               LIMIT 1"
         );
     default:                                                    //-Fall through from above processing ...
