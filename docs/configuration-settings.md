@@ -2,6 +2,10 @@
 
 This reference covers every setting shown under **Configuration > Google Product Feeder** in Reimagined Release v1.0.17.
 
+The installation defaults and keys come from `YOUR_ADMIN/includes/init_includes/init_gpsf_admin.php`. Existing store values are preserved on upgrade. The version rows are read only; optional product field controls describe columns rather than containing product values.
+
+To maintain this list for a new release, compare the initial configuration insert and later upgrade inserts with this page. Update labels, defaults, choices, and instructions when behavior changes, then run `python3 tests/check_configuration_reference.py`. That check confirms every installed setting has one table row and catches stale keys; review the prose and values manually as well. Older FTP, language, and address keys removed during migration are intentionally excluded.
+
 ## 1. Status and security
 
 | Setting | Configuration key | Default or choices | Instructions |
