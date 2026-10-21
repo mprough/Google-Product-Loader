@@ -6,5 +6,9 @@
 //
 // Last updated: Reimagined Release v1.0.17
 //
-define('BOX_GPSF', 'Google Product Feeder');
-define('BOX_CONFIGURATION_GPSF', 'Google Product Feeder');
+if (!defined('BOX_GPSF')) {
+    define('BOX_GPSF', 'Google Product Feeder');
+}
+if (!defined('BOX_CONFIGURATION_GPSF')) {
+    define('BOX_CONFIGURATION_GPSF', 'Google Product Feeder');
+}
