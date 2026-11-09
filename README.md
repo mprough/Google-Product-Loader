@@ -1,5 +1,7 @@
 # Zen Cart&reg; Google Product Search Feeder II (Reimagined), Release v1.0.17
 
+**Download the install ZIP:** [Google-Product-Loader-v1.0.17.zip](https://raw.githubusercontent.com/mprough/Google-Product-Loader/main/dist/Google-Product-Loader-v1.0.17.zip). Extract it on your computer and follow the installation instructions below.
+
 Zen Cart® Google Product Search Feeder II (Reimagined) generates Google Merchant Center product feeds from a Zen Cart catalog. This independent fork is based on Google Product Search Feeder II v1.0.5 and updates it for current Zen Cart releases. Reimagined Release v1.0.17 is compatible with Zen Cart 2.2.2 and PHP 8.5 while retaining support for Zen Cart 1.5.6b and later and PHP 7.0 and later.
 
 ## Features
